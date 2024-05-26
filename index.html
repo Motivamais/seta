@@ -18,13 +18,13 @@
         .container {
             display: flex;
             justify-content: space-between;
-            width: 90%;
+            width: 100%;
             max-width: 1200px;
             margin-bottom: 20px;
         }
 
         .questions, .answers {
-            width: 45%;
+            flex: 1;
         }
 
         .questions {
@@ -66,46 +66,38 @@
 
         @media (max-width: 768px) {
             .container {
-                flex-direction: column;
-                align-items: center;
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
             }
 
             .questions, .answers {
-                width: 90%;
-                margin-right: 0;
+                width: 45%;
             }
 
-            .questions, .answers {
-                width: 100%;
-            }
-
-            .question, .answer {
-                width: calc(50% - 20px);
-                margin: 10px 10px;
+            .questions {
+                margin-right: 5%;
             }
         }
 
         @media (max-width: 480px) {
             .container {
-                flex-direction: column;
-                align-items: center;
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+            }
+
+            .questions, .answers {
+                width: 45%;
             }
 
             .questions {
-                order: 2;
-                width: 100%;
-                margin-right: 0;
-            }
-
-            .answers {
-                order: 1;
-                width: 100%;
-                margin-right: 0;
+                margin-right: 10%;
             }
 
             .question, .answer {
-                width: calc(100% - 20px);
-                margin: 10px 10px;
+                width: 100%;
+                margin: 10px 0;
             }
         }
     </style>
