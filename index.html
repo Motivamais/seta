@@ -28,30 +28,30 @@
         }
 
         .questions {
-            margin-right: 200px; /* Increase the margin to separate questions and answers */
+            margin-right: 200px;
         }
 
         .question, .answer {
             background-color: #ffffff;
             border: 1px solid #ddd;
-            padding: 5px; /* Reduced padding */
-            margin: 5px 0; /* Reduced margin */
+            padding: 5px;
+            margin: 5px 0;
             cursor: pointer;
             user-select: none;
             text-align: center;
-            font-size: 14px; /* Adjust font size if needed */
-            width: 70%; /* Reduced width */
+            font-size: 14px;
+            width: 70%;
         }
 
-        .question.selected {
-            background-color: #d3d3d3; /* Gray color when selected */
+        .selected {
+            background-color: #d3d3d3;
         }
 
-        .question.correct, .answer.correct {
+        .correct {
             background-color: lightgreen;
         }
 
-        .question.incorrect, .answer.incorrect {
+        .incorrect {
             background-color: lightcoral;
         }
 
@@ -103,7 +103,7 @@
 
             .question, .answer {
                 width: 100%;
-                margin: 5px 0; /* Reduced margin */
+                margin: 5px 0;
             }
         }
     </style>
@@ -119,105 +119,80 @@
             <div class="question" id="q4">Quem foi o líder da Inconfidência Mineira?</div>
         </div>
         <div class="answers">
-            <div class="answer" id="a1">1822</div>
-            <div class="answer" id="a2">Tiradentes</div>
             <div class="answer" id="a3">Rio de Janeiro</div>
             <div class="answer" id="a4">Deodoro da Fonseca</div>
+            <div class="answer" id="a2">Tiradentes</div>
+            <div class="answer" id="a1">1822</div>
         </div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
+        document.addEventListener('DOMContentLoaded', () => {
             const questions = document.querySelectorAll('.question');
             const answers = document.querySelectorAll('.answer');
             const resetButton = document.getElementById('resetButton');
-            let startElement = null;
-            let selectedQuestion = null;
+            let selectedElement = null;
             const lines = [];
-            const matchedQuestions = new Set();
-            const matchedAnswers = new Set();
+            const matchedElements = new Set();
 
-            function selectQuestion(event) {
-                if (!matchedQuestions.has(event.target.id)) {
-                    if (selectedQuestion) {
-                        selectedQuestion.classList.remove('selected');
-                    }
-                    selectedQuestion = event.target;
-                    selectedQuestion.classList.add('selected');
-                }
-            }
-
-            function startLine(event) {
-                if (selectedQuestion && !matchedAnswers.has(event.target.id)) {
-                    startElement = selectedQuestion;
-                    line = new LeaderLine(startElement, event.target, { color: 'blue', dash: { animation: true } });
-                    endLine(event);
-                }
-            }
-
-            function endLine(event) {
-                if (line) {
-                    line.remove();
-                }
-                if (startElement) {
-                    const isQuestion = startElement.classList.contains('question');
-                    const isAnswer = event.target.classList.contains('answer');
-                    if (isQuestion && isAnswer && !matchedAnswers.has(event.target.id) && !matchedQuestions.has(startElement.id)) {
-                        const questionId = startElement.id;
-                        const answerId = event.target.id;
-                        if (isCorrectMatch(questionId, answerId)) {
-                            const newLine = new LeaderLine(startElement, event.target, { color: 'green' });
-                            lines.push(newLine);
-                            startElement.classList.add('correct');
-                            event.target.classList.add('correct');
-                        } else {
-                            const newLine = new LeaderLine(startElement, event.target, { color: 'red' });
-                            lines.push(newLine);
-                            startElement.classList.add('incorrect');
-                            event.target.classList.add('incorrect');
-                        }
-                        matchedQuestions.add(questionId);
-                        matchedAnswers.add(answerId);
+            function selectElement(event) {
+                if (!matchedElements.has(event.target.id)) {
+                    if (selectedElement) {
+                        selectedElement.classList.remove('selected');
+                        drawLine(selectedElement, event.target);
+                        selectedElement = null;
+                    } else {
+                        selectedElement = event.target;
+                        selectedElement.classList.add('selected');
                     }
                 }
-                startElement = null;
-                selectedQuestion.classList.remove('selected');
-                selectedQuestion = null;
-                line = null;
             }
 
-            function isCorrectMatch(questionId, answerId) {
+            function drawLine(startElement, endElement) {
+                const line = new LeaderLine(startElement, endElement, {
+                    color: 'blue',
+                    path: 'straight'
+                });
+
+                const isCorrect = isCorrectMatch(startElement.id, endElement.id);
+                line.setOptions({ color: isCorrect ? 'green' : 'red' });
+
+                startElement.classList.add(isCorrect ? 'correct' : 'incorrect');
+                endElement.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+                matchedElements.add(startElement.id);
+                matchedElements.add(endElement.id);
+
+                lines.push(line);
+            }
+
+            function isCorrectMatch(id1, id2) {
                 const correctMatches = {
                     q1: 'a4',
                     q2: 'a1',
                     q3: 'a3',
                     q4: 'a2'
                 };
-                return correctMatches[questionId] === answerId;
+                return correctMatches[id1] === id2 || correctMatches[id2] === id1;
             }
 
             function resetQuiz() {
                 lines.forEach(line => line.remove());
                 lines.length = 0;
-                matchedQuestions.clear();
-                matchedAnswers.clear();
+                matchedElements.clear();
 
-                questions.forEach(question => {
-                    question.classList.remove('correct', 'incorrect', 'selected');
+                document.querySelectorAll('.selected, .correct, .incorrect').forEach(el => {
+                    el.classList.remove('selected', 'correct', 'incorrect');
                 });
 
-                answers.forEach(answer => {
-                    answer.classList.remove('correct', 'incorrect');
-                });
-
-                selectedQuestion = null;
+                selectedElement = null;
             }
 
             questions.forEach(question => {
-                question.addEventListener('click', selectQuestion);
+                question.addEventListener('click', selectElement);
             });
 
             answers.forEach(answer => {
-                answer.addEventListener('click', startLine);
+                answer.addEventListener('click', selectElement);
             });
 
             resetButton.addEventListener('click', resetQuiz);
