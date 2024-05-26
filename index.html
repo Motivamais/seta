@@ -40,7 +40,11 @@
             user-select: none;
             text-align: center;
             font-size: 14px; /* Adjust font size if needed */
-            width: 80%; /* Set width to 80% of its container */
+            width: 70%; /* Reduced width */
+        }
+
+        .question.selected {
+            background-color: #d3d3d3; /* Gray color when selected */
         }
 
         .question.correct, .answer.correct {
@@ -127,21 +131,26 @@
             const answers = document.querySelectorAll('.answer');
             const resetButton = document.getElementById('resetButton');
             let startElement = null;
-            let line = null;
+            let selectedQuestion = null;
             const lines = [];
             const matchedQuestions = new Set();
             const matchedAnswers = new Set();
 
-            function startLine(event) {
+            function selectQuestion(event) {
                 if (!matchedQuestions.has(event.target.id)) {
-                    startElement = event.target;
-                    line = new LeaderLine(event.target, event.target, { color: 'blue', dash: { animation: true } });
+                    if (selectedQuestion) {
+                        selectedQuestion.classList.remove('selected');
+                    }
+                    selectedQuestion = event.target;
+                    selectedQuestion.classList.add('selected');
                 }
             }
 
-            function moveLine(event) {
-                if (line) {
-                    line.setOptions({ end: { x: event.pageX, y: event.pageY } });
+            function startLine(event) {
+                if (selectedQuestion && !matchedAnswers.has(event.target.id)) {
+                    startElement = selectedQuestion;
+                    line = new LeaderLine(startElement, event.target, { color: 'blue', dash: { animation: true } });
+                    endLine(event);
                 }
             }
 
@@ -171,6 +180,8 @@
                     }
                 }
                 startElement = null;
+                selectedQuestion.classList.remove('selected');
+                selectedQuestion = null;
                 line = null;
             }
 
@@ -191,26 +202,23 @@
                 matchedAnswers.clear();
 
                 questions.forEach(question => {
-                    question.classList.remove('correct', 'incorrect');
+                    question.classList.remove('correct', 'incorrect', 'selected');
                 });
 
                 answers.forEach(answer => {
                     answer.classList.remove('correct', 'incorrect');
                 });
+
+                selectedQuestion = null;
             }
 
             questions.forEach(question => {
-                question.addEventListener('mousedown', startLine);
-                question.addEventListener('touchstart', startLine);
+                question.addEventListener('click', selectQuestion);
             });
 
             answers.forEach(answer => {
-                answer.addEventListener('mouseup', endLine);
-                answer.addEventListener('touchend', endLine);
+                answer.addEventListener('click', startLine);
             });
-
-            document.addEventListener('mousemove', moveLine);
-            document.addEventListener('touchmove', moveLine);
 
             resetButton.addEventListener('click', resetQuiz);
         });
