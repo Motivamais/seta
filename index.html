@@ -88,16 +88,23 @@
         @media (max-width: 480px) {
             .container {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: center;
             }
 
-            .questions, .answers {
+            .questions {
+                order: 2;
+                width: 100%;
+                margin-right: 0;
+            }
+
+            .answers {
+                order: 1;
                 width: 100%;
                 margin-right: 0;
             }
 
             .question, .answer {
-                width: calc(50% - 20px);
+                width: calc(100% - 20px);
                 margin: 10px 10px;
             }
         }
