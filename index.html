@@ -21,38 +21,30 @@
             width: 100%;
             max-width: 1200px;
             margin-bottom: 20px;
-            position: relative;
+        }
+
+        .questions, .answers {
+            flex: 1;
         }
 
         .questions {
-            width: 20%;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .answers {
-            width: 20%;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            position: absolute;
-            right: 0;
+            margin-right: 200px; /* Increase the margin to separate questions and answers */
         }
 
         .question, .answer {
             background-color: #ffffff;
             border: 1px solid #ddd;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 5px; /* Reduced padding */
+            margin: 5px 0; /* Reduced margin */
             cursor: pointer;
             user-select: none;
             text-align: center;
-            font-size: 16px;
+            font-size: 14px; /* Adjust font size if needed */
+            width: 70%; /* Reduced width */
         }
 
-        .selected {
-            background-color: #d3d3d3;
+        .question.selected {
+            background-color: #d3d3d3; /* Gray color when selected */
         }
 
         .question.correct, .answer.correct {
@@ -79,6 +71,12 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+            }
+
             .questions, .answers {
                 width: 45%;
             }
@@ -86,29 +84,26 @@
             .questions {
                 margin-right: 5%;
             }
-
-            .answers {
-                position: static;
-            }
         }
 
         @media (max-width: 480px) {
             .container {
-                flex-direction: column;
-                align-items: center;
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
             }
 
             .questions, .answers {
-                width: 90%;
-                position: static;
+                width: 45%;
             }
 
             .questions {
-                margin-right: 0;
+                margin-right: 10%;
             }
 
-            .answers {
-                margin-top: 20px;
+            .question, .answer {
+                width: 100%;
+                margin: 5px 0; /* Reduced margin */
             }
         }
     </style>
@@ -123,91 +118,79 @@
             <div class="question" id="q3">Qual era a capital do Brasil antes de Brasília?</div>
             <div class="question" id="q4">Quem foi o líder da Inconfidência Mineira?</div>
         </div>
-        <div class="answers" id="answersContainer">
-            <div class="answer" id="a1">Deodoro da Fonseca</div>
-            <div class="answer" id="a2">1822</div>
+        <div class="answers">
+            <div class="answer" id="a1">1822</div>
+            <div class="answer" id="a2">Tiradentes</div>
             <div class="answer" id="a3">Rio de Janeiro</div>
-            <div class="answer" id="a4">Tiradentes</div>
+            <div class="answer" id="a4">Deodoro da Fonseca</div>
         </div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
-            const items = document.querySelectorAll('.question, .answer');
+            const questions = document.querySelectorAll('.question');
+            const answers = document.querySelectorAll('.answer');
             const resetButton = document.getElementById('resetButton');
             let startElement = null;
+            let selectedQuestion = null;
             const lines = [];
             const matchedQuestions = new Set();
             const matchedAnswers = new Set();
 
-            function shuffleAnswers() {
-                const answersContainer = document.getElementById('answersContainer');
-                for (let i = answersContainer.children.length; i >= 0; i--) {
-                    answersContainer.appendChild(answersContainer.children[Math.random() * i | 0]);
+            function selectQuestion(event) {
+                if (!matchedQuestions.has(event.target.id)) {
+                    if (selectedQuestion) {
+                        selectedQuestion.classList.remove('selected');
+                    }
+                    selectedQuestion = event.target;
+                    selectedQuestion.classList.add('selected');
                 }
             }
 
-            function selectItem(event) {
-                const selectedItem = event.target;
+            function startLine(event) {
+                if (selectedQuestion && !matchedAnswers.has(event.target.id)) {
+                    startElement = selectedQuestion;
+                    line = new LeaderLine(startElement, event.target, { color: 'blue', dash: { animation: true } });
+                    endLine(event);
+                }
+            }
 
+            function endLine(event) {
+                if (line) {
+                    line.remove();
+                }
                 if (startElement) {
-                    if (startElement.classList.contains('question') && selectedItem.classList.contains('answer')) {
-                        drawLine(startElement, selectedItem);
-                    } else if (startElement.classList.contains('answer') && selectedItem.classList.contains('question')) {
-                        drawLine(selectedItem, startElement);
+                    const isQuestion = startElement.classList.contains('question');
+                    const isAnswer = event.target.classList.contains('answer');
+                    if (isQuestion && isAnswer && !matchedAnswers.has(event.target.id) && !matchedQuestions.has(startElement.id)) {
+                        const questionId = startElement.id;
+                        const answerId = event.target.id;
+                        if (isCorrectMatch(questionId, answerId)) {
+                            const newLine = new LeaderLine(startElement, event.target, { color: 'green' });
+                            lines.push(newLine);
+                            startElement.classList.add('correct');
+                            event.target.classList.add('correct');
+                        } else {
+                            const newLine = new LeaderLine(startElement, event.target, { color: 'red' });
+                            lines.push(newLine);
+                            startElement.classList.add('incorrect');
+                            event.target.classList.add('incorrect');
+                        }
+                        matchedQuestions.add(questionId);
+                        matchedAnswers.add(answerId);
                     }
-                    startElement.classList.remove('selected');
-                    startElement = null;
-                } else {
-                    startElement = selectedItem;
-                    startElement.classList.add('selected');
                 }
-            }
-
-            function drawLine(startElement, endElement) {
-                const startId = startElement.id;
-                const endId = endElement.id;
-
-                if (!matchedQuestions.has(startId) && !matchedAnswers.has(endId)) {
-                    if (isCorrectMatch(startId, endId)) {
-                        const newLine = new LeaderLine(
-                            startElement,
-                            endElement,
-                            {
-                                color: 'green',
-                                startPlug: 'disc',
-                                endPlug: 'arrow3',
-                                path: 'straight'
-                            }
-                        );
-                        lines.push(newLine);
-                        startElement.classList.add('correct');
-                        endElement.classList.add('correct');
-                    } else {
-                        const newLine = new LeaderLine(
-                            startElement,
-                            endElement,
-                            {
-                                color: 'red',
-                                startPlug: 'disc',
-                                endPlug: 'arrow3',
-                                path: 'straight'
-                            }
-                        );
-                        lines.push(newLine);
-                        startElement.classList.add('incorrect');
-                        endElement.classList.add('incorrect');
-                    }
-                    matchedQuestions.add(startId);
-                    matchedAnswers.add(endId);
-                }
+                startElement = null;
+                selectedQuestion.classList.remove('selected');
+                selectedQuestion = null;
+                line = null;
             }
 
             function isCorrectMatch(questionId, answerId) {
                 const correctMatches = {
-                    q1: 'a1',
-                    q2: 'a2',
+                    q1: 'a4',
+                    q2: 'a1',
                     q3: 'a3',
-                    q4: 'a4'
+                    q4: 'a2'
                 };
                 return correctMatches[questionId] === answerId;
             }
@@ -218,21 +201,26 @@
                 matchedQuestions.clear();
                 matchedAnswers.clear();
 
-                items.forEach(item => {
-                    item.classList.remove('correct', 'incorrect', 'selected');
+                questions.forEach(question => {
+                    question.classList.remove('correct', 'incorrect', 'selected');
                 });
 
-                startElement = null;
-                shuffleAnswers();
+                answers.forEach(answer => {
+                    answer.classList.remove('correct', 'incorrect');
+                });
+
+                selectedQuestion = null;
             }
 
-            items.forEach(item => {
-                item.addEventListener('click', selectItem);
+            questions.forEach(question => {
+                question.addEventListener('click', selectQuestion);
+            });
+
+            answers.forEach(answer => {
+                answer.addEventListener('click', startLine);
             });
 
             resetButton.addEventListener('click', resetQuiz);
-
-            shuffleAnswers();
         });
     </script>
 </body>
