@@ -24,11 +24,11 @@
         }
 
         .questions, .answers {
-            width: 40%;
+            flex: 1;
         }
 
         .questions {
-            margin-right: 20%;
+            margin-right: 200px; /* Increase the margin to separate questions and answers */
         }
 
         .question, .answer {
@@ -40,6 +40,7 @@
             user-select: none;
             text-align: center;
             font-size: 14px; /* Adjust font size if needed */
+            width: 70%; /* Reduced width */
         }
 
         .question.selected {
@@ -87,20 +88,22 @@
 
         @media (max-width: 480px) {
             .container {
-                flex-direction: column;
-                align-items: center;
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
             }
 
             .questions, .answers {
-                width: 90%;
+                width: 45%;
             }
 
             .questions {
-                margin-right: 0;
+                margin-right: 10%;
             }
 
-            .answers {
-                margin-top: 20px;
+            .question, .answer {
+                width: 100%;
+                margin: 5px 0; /* Reduced margin */
             }
         }
     </style>
@@ -116,10 +119,10 @@
             <div class="question" id="q4">Quem foi o líder da Inconfidência Mineira?</div>
         </div>
         <div class="answers">
-            <div class="answer" id="a1">Deodoro da Fonseca</div>
-            <div class="answer" id="a2">1822</div>
+            <div class="answer" id="a1">1822</div>
+            <div class="answer" id="a2">Tiradentes</div>
             <div class="answer" id="a3">Rio de Janeiro</div>
-            <div class="answer" id="a4">Tiradentes</div>
+            <div class="answer" id="a4">Deodoro da Fonseca</div>
         </div>
     </div>
     <script>
@@ -184,10 +187,10 @@
 
             function isCorrectMatch(questionId, answerId) {
                 const correctMatches = {
-                    q1: 'a1',
-                    q2: 'a2',
+                    q1: 'a4',
+                    q2: 'a1',
                     q3: 'a3',
-                    q4: 'a4'
+                    q4: 'a2'
                 };
                 return correctMatches[questionId] === answerId;
             }
