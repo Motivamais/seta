@@ -58,6 +58,17 @@
         .reset-button:hover {
             background-color: #0056b3;
         }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .questions, .answers {
+                width: 90%;
+            }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.7/leader-line.min.js"></script>
 </head>
