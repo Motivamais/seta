@@ -17,18 +17,18 @@
 
         .container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: space-between;
             width: 100%;
             max-width: 1200px;
             margin-bottom: 20px;
         }
 
-        .row {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 10px;
+        .questions, .answers {
+            width: 40%;
+        }
+
+        .questions {
+            margin-right: 20%;
         }
 
         .question, .answer {
@@ -40,7 +40,6 @@
             user-select: none;
             text-align: center;
             font-size: 14px; /* Adjust font size if needed */
-            width: 45%; /* Adjust width */
         }
 
         .question.selected {
@@ -71,33 +70,37 @@
         }
 
         @media (max-width: 768px) {
-            .question, .answer {
-                width: 45%;
-                margin: 5px 0; /* Reduced margin */
-            }
-
-            .row {
-                justify-content: flex-start;
-            }
-
             .container {
-                padding: 0 10px;
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: space-between;
+            }
+
+            .questions, .answers {
+                width: 45%;
+            }
+
+            .questions {
+                margin-right: 5%;
             }
         }
 
         @media (max-width: 480px) {
-            .question, .answer {
-                width: 100%;
-                margin: 5px 0; /* Reduced margin */
-            }
-
-            .row {
+            .container {
                 flex-direction: column;
                 align-items: center;
             }
 
-            .container {
-                padding: 0 20px;
+            .questions, .answers {
+                width: 90%;
+            }
+
+            .questions {
+                margin-right: 0;
+            }
+
+            .answers {
+                margin-top: 20px;
             }
         }
     </style>
@@ -106,20 +109,16 @@
 <body>
     <button class="reset-button" id="resetButton">Reset</button>
     <div class="container">
-        <div class="row">
+        <div class="questions">
             <div class="question" id="q1">Quem foi o primeiro presidente do Brasil?</div>
-            <div class="answer" id="a1">Deodoro da Fonseca</div>
-        </div>
-        <div class="row">
             <div class="question" id="q2">Em que ano ocorreu a independência do Brasil?</div>
-            <div class="answer" id="a2">1822</div>
-        </div>
-        <div class="row">
             <div class="question" id="q3">Qual era a capital do Brasil antes de Brasília?</div>
-            <div class="answer" id="a3">Rio de Janeiro</div>
-        </div>
-        <div class="row">
             <div class="question" id="q4">Quem foi o líder da Inconfidência Mineira?</div>
+        </div>
+        <div class="answers">
+            <div class="answer" id="a1">Deodoro da Fonseca</div>
+            <div class="answer" id="a2">1822</div>
+            <div class="answer" id="a3">Rio de Janeiro</div>
             <div class="answer" id="a4">Tiradentes</div>
         </div>
     </div>
