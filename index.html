@@ -17,34 +17,42 @@
 
         .container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: space-between;
             width: 100%;
             max-width: 1200px;
             margin-bottom: 20px;
+            position: relative;
         }
 
-        .row {
+        .questions {
+            width: 20%;
             display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 10px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .answers {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: absolute;
+            right: 0;
         }
 
         .question, .answer {
             background-color: #ffffff;
             border: 1px solid #ddd;
-            padding: 10px; /* Restored padding */
-            margin: 10px 0; /* Restored margin */
+            padding: 10px;
+            margin: 10px 0;
             cursor: pointer;
             user-select: none;
             text-align: center;
-            font-size: 16px; /* Restored font size */
-            width: 45%; /* Adjust width */
+            font-size: 16px;
         }
 
         .selected {
-            background-color: #d3d3d3; /* Gray color when selected */
+            background-color: #d3d3d3;
         }
 
         .question.correct, .answer.correct {
@@ -71,32 +79,36 @@
         }
 
         @media (max-width: 768px) {
-            .question, .answer {
+            .questions, .answers {
                 width: 45%;
-                margin: 5px 0; /* Reduced margin */
             }
 
-            .row {
-                justify-content: space-between;
+            .questions {
+                margin-right: 5%;
             }
 
-            .container {
-                padding: 0 10px;
+            .answers {
+                position: static;
             }
         }
 
         @media (max-width: 480px) {
-            .question, .answer {
-                width: 100%;
-                margin: 5px 0; /* Reduced margin */
-            }
-
-            .row {
-                justify-content: space-between;
-            }
-
             .container {
-                padding: 0 20px;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .questions, .answers {
+                width: 90%;
+                position: static;
+            }
+
+            .questions {
+                margin-right: 0;
+            }
+
+            .answers {
+                margin-top: 20px;
             }
         }
     </style>
@@ -105,20 +117,16 @@
 <body>
     <button class="reset-button" id="resetButton">Reset</button>
     <div class="container">
-        <div class="row">
+        <div class="questions">
             <div class="question" id="q1">Quem foi o primeiro presidente do Brasil?</div>
-            <div class="answer" id="a1">Deodoro da Fonseca</div>
-        </div>
-        <div class="row">
             <div class="question" id="q2">Em que ano ocorreu a independência do Brasil?</div>
-            <div class="answer" id="a2">1822</div>
-        </div>
-        <div class="row">
             <div class="question" id="q3">Qual era a capital do Brasil antes de Brasília?</div>
-            <div class="answer" id="a3">Rio de Janeiro</div>
-        </div>
-        <div class="row">
             <div class="question" id="q4">Quem foi o líder da Inconfidência Mineira?</div>
+        </div>
+        <div class="answers" id="answersContainer">
+            <div class="answer" id="a1">Deodoro da Fonseca</div>
+            <div class="answer" id="a2">1822</div>
+            <div class="answer" id="a3">Rio de Janeiro</div>
             <div class="answer" id="a4">Tiradentes</div>
         </div>
     </div>
@@ -130,6 +138,13 @@
             const lines = [];
             const matchedQuestions = new Set();
             const matchedAnswers = new Set();
+
+            function shuffleAnswers() {
+                const answersContainer = document.getElementById('answersContainer');
+                for (let i = answersContainer.children.length; i >= 0; i--) {
+                    answersContainer.appendChild(answersContainer.children[Math.random() * i | 0]);
+                }
+            }
 
             function selectItem(event) {
                 const selectedItem = event.target;
@@ -209,16 +224,6 @@
 
                 startElement = null;
                 shuffleAnswers();
-            }
-
-            function shuffleAnswers() {
-                const rows = document.querySelectorAll('.row');
-                rows.forEach(row => {
-                    const answersContainer = row.querySelector('.answer').parentElement;
-                    for (let i = answersContainer.children.length; i >= 0; i--) {
-                        answersContainer.appendChild(answersContainer.children[Math.random() * i | 0]);
-                    }
-                });
             }
 
             items.forEach(item => {
