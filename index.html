@@ -118,7 +118,7 @@
             <div class="question" id="q3">Qual era a capital do Brasil antes de Brasília?</div>
             <div class="question" id="q4">Quem foi o líder da Inconfidência Mineira?</div>
         </div>
-        <div class="answers">
+        <div class="answers" id="answersContainer">
             <div class="answer" id="a3">Rio de Janeiro</div>
             <div class="answer" id="a4">Deodoro da Fonseca</div>
             <div class="answer" id="a2">Tiradentes</div>
@@ -128,7 +128,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const questions = document.querySelectorAll('.question');
-            const answers = document.querySelectorAll('.answer');
+            const answersContainer = document.getElementById('answersContainer');
             const resetButton = document.getElementById('resetButton');
             let selectedElement = null;
             const lines = [];
@@ -136,7 +136,13 @@
 
             function selectElement(event) {
                 if (!matchedElements.has(event.target.id)) {
+                    const isQuestion = event.target.classList.contains('question');
+                    const isAnswer = event.target.classList.contains('answer');
+
                     if (selectedElement) {
+                        if (isQuestion && selectedElement.classList.contains('question')) return;
+                        if (isAnswer && selectedElement.classList.contains('answer')) return;
+
                         selectedElement.classList.remove('selected');
                         drawLine(selectedElement, event.target);
                         selectedElement = null;
@@ -185,14 +191,25 @@
                 });
 
                 selectedElement = null;
+                shuffleAnswers();
+            }
+
+            function shuffleAnswers() {
+                const answers = Array.from(answersContainer.children);
+                for (let i = answers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    answersContainer.appendChild(answers[j]);
+                }
             }
 
             questions.forEach(question => {
                 question.addEventListener('click', selectElement);
             });
 
-            answers.forEach(answer => {
-                answer.addEventListener('click', selectElement);
+            answersContainer.addEventListener('click', (event) => {
+                if (event.target.classList.contains('answer')) {
+                    selectElement(event);
+                }
             });
 
             resetButton.addEventListener('click', resetQuiz);
