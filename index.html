@@ -18,13 +18,13 @@
         .container {
             display: flex;
             justify-content: space-between;
-            width: 80%;
+            width: 90%;
             max-width: 1200px;
             margin-bottom: 20px;
         }
 
         .questions, .answers {
-            width: 40%;
+            width: 45%;
         }
 
         .questions {
@@ -73,6 +73,15 @@
             .questions, .answers {
                 width: 90%;
                 margin-right: 0;
+            }
+
+            .questions, .answers {
+                width: 100%;
+            }
+
+            .question, .answer {
+                width: calc(50% - 20px);
+                margin: 10px 10px;
             }
         }
 
