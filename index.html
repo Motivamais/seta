@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de História do Brasil</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            max-width: 1000px;
+            margin-bottom: 20px;
+        }
+
+        .questions, .answers {
+            width: 45%;
+        }
+
+        .question, .answer {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+        }
+
+        .question.correct, .answer.correct {
+            background-color: lightgreen;
+        }
+
+        .question.incorrect, .answer.incorrect {
+            background-color: lightcoral;
+        }
+
+        .reset-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .reset-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.7/leader-line.min.js"></script>
+</head>
+<body>
+    <button class="reset-button" id="resetButton">Reset</button>
+    <div class="container">
+        <div class="questions">
+            <div class="question" id="q1">Quem foi o primeiro presidente do Brasil?</div>
+            <div class="question" id="q2">Em que ano ocorreu a independência do Brasil?</div>
+            <div class="question" id="q3">Qual era a capital do Brasil antes de Brasília?</div>
+            <div class="question" id="q4">Quem foi o líder da Inconfidência Mineira?</div>
+        </div>
+        <div class="answers">
+            <div class="answer" id="a1">1822</div>
+            <div class="answer" id="a2">Tiradentes</div>
+            <div class="answer" id="a3">Rio de Janeiro</div>
+            <div class="answer" id="a4">Deodoro da Fonseca</div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const questions = document.querySelectorAll('.question');
+            const answers = document.querySelectorAll('.answer');
+            const resetButton = document.getElementById('resetButton');
+            let startElement = null;
+            let line = null;
+            const lines = [];
+            const matchedQuestions = new Set();
+            const matchedAnswers = new Set();
+
+            function startLine(event) {
+                if (!matchedQuestions.has(event.target.id)) {
+                    startElement = event.target;
+                    line = new LeaderLine(event.target, event.target, { color: 'blue', dash: { animation: true } });
+                }
+            }
+
+            function moveLine(event) {
+                if (line) {
+                    line.setOptions({ end: { x: event.pageX, y: event.pageY } });
+                }
+            }
+
+            function endLine(event) {
+                if (line) {
+                    line.remove();
+                }
+                if (startElement) {
+                    const isQuestion = startElement.classList.contains('question');
+                    const isAnswer = event.target.classList.contains('answer');
+                    if (isQuestion && isAnswer && !matchedAnswers.has(event.target.id)) {
+                        const questionId = startElement.id;
+                        const answerId = event.target.id;
+                        if (isCorrectMatch(questionId, answerId)) {
+                            const newLine = new LeaderLine(startElement, event.target, { color: 'green' });
+                            lines.push(newLine);
+                            startElement.classList.add('correct');
+                            event.target.classList.add('correct');
+                        } else {
+                            const newLine = new LeaderLine(startElement, event.target, { color: 'red' });
+                            lines.push(newLine);
+                            startElement.classList.add('incorrect');
+                            event.target.classList.add('incorrect');
+                        }
+                        matchedQuestions.add(questionId);
+                        matchedAnswers.add(answerId);
+                    }
+                }
+                startElement = null;
+                line = null;
+            }
+
+            function isCorrectMatch(questionId, answerId) {
+                const correctMatches = {
+                    q1: 'a4',
+                    q2: 'a1',
+                    q3: 'a3',
+                    q4: 'a2'
+                };
+                return correctMatches[questionId] === answerId;
+            }
+
+            function resetQuiz() {
+                lines.forEach(line => line.remove());
+                lines.length = 0;
+                matchedQuestions.clear();
+                matchedAnswers.clear();
+
+                questions.forEach(question => {
+                    question.classList.remove('correct', 'incorrect');
+                });
+
+                answers.forEach(answer => {
+                    answer.classList.remove('correct', 'incorrect');
+                });
+            }
+
+            questions.forEach(question => {
+                question.addEventListener('mousedown', startLine);
+                question.addEventListener('touchstart', startLine);
+            });
+
+            answers.forEach(answer => {
+                answer.addEventListener('mouseup', endLine);
+                answer.addEventListener('touchend', endLine);
+            });
+
+            document.addEventListener('mousemove', moveLine);
+            document.addEventListener('touchmove', moveLine);
+
+            resetButton.addEventListener('click', resetQuiz);
+        });
+    </script>
+</body>
+</html>
